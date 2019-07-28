@@ -12,7 +12,9 @@
     "react-scripts": "3.0.1",
     "typescript": "3.5.3"
   },
+  "homepage": "https://tktk0430.github.io/React_Syogi.io/",
   "scripts": {
+    "deploy": "npm run build && gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -32,5 +34,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "gh-pages": "^2.0.1"
   }
 }
