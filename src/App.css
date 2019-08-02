@@ -19,7 +19,7 @@ ol, ul {
 
 .square {
   background: #fff;
-  border: 1px solid #999;
+  border: 1px solid darkslategrey;
   float: left;
   font-size: 24px;
   font-weight: bold;
@@ -30,13 +30,23 @@ ol, ul {
   padding: 0;
   text-align: center;
   width: 34px;
+  background-color: burlywood
 }
 
-.enemy_side{
+.b_side{
   transform: rotate( -180deg );
 }
+
+.to_move{
+  background-color: palevioletred;
+}
+
 .square:focus {
   outline: none;
+}
+
+.move_target{
+  background-color: lightgreen;
 }
 
 .kbd-navigation .square:focus {
