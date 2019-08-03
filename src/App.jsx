@@ -2,14 +2,14 @@ import React from 'react';
 import './App.css';
 import {PIECES, WALL} from "./CONST.jsx"
 
-const A_SIDE='a_side';
-const B_SIDE='b_side';
+const A_SIDE='YOU';
+const B_SIDE='OPPONENT';
 const STAND_BY = 'stand_by';
 const PICK_UP = 'pick_up';
 
 class Square extends React.Component {
   render() {
-    const {piece,owner,toMove} = this.props //変更
+    const {piece,owner,toMove} = this.props
     let to_move=""
     if (toMove){to_move='to_move'}
     return (
@@ -74,12 +74,16 @@ class Board extends React.Component {
   }
   
   handleClick=(i)=>{
-    console.log(i)
-    const {player,phase,changePlayer,changePhase}=this.props
+    const {player,phase,gameFinished,changePlayer,changePhase,judgeFinish}=this.props
     const squares = this.state.squares.slice()
     const {selectedSquareNo} = this.state
     const {piece, owner, toMove} = squares[i]
     let { pointMove, lineMove }= PIECES[piece]
+
+    if (gameFinished){
+      alert('ゲームを再開してください')
+      return ''
+    }
 
     if (player===B_SIDE){
       let {newPointMove, newLineMove} = this.convertMove(pointMove,lineMove)
@@ -97,11 +101,14 @@ class Board extends React.Component {
         break
       case PICK_UP:
         if (toMove){
+          const gameFinished = judgeFinish(i,squares)
           squares[i]=squares[selectedSquareNo]
           squares[selectedSquareNo]={'piece':'','owner':'','toMove':false}
           this.setState({squares:squares})
           changePhase(STAND_BY)
-          changePlayer()
+          if (!gameFinished){
+            changePlayer()
+          }
         }else if(owner===player){
           this.getMoveList(i,pointMove,lineMove,squares,player)
         }else{
@@ -180,7 +187,6 @@ class Board extends React.Component {
   }
 
   render() {
-    const status = 'Next player: X';
     const squaress = []
     
     for (let i=1;i<=9;i++){
@@ -193,8 +199,6 @@ class Board extends React.Component {
     
     return (
       <div>
-        <div className="status">{status}</div>
-        <p>selected : {this.state.selectedSquareNo}</p>
         {squaress.map(c=>{
             return(
               <div className="board-row" key = {c.join()}>
@@ -204,7 +208,7 @@ class Board extends React.Component {
               </div>)
         })}
         <br/>
-        <button onClick={()=>this.initAll()}>初期化</button>
+        <button onClick={()=>this.initAll()}>ゲーム再開</button>
       </div>
     );
   }
@@ -215,11 +219,12 @@ class Game extends React.Component {
     super(props);
     this.state = {
       player: A_SIDE, 
-      phase: STAND_BY}
+      phase: STAND_BY,
+      gameFinished: false}
   }
 
   _initGame=()=>{
-    this.setState({player: A_SIDE, phase: STAND_BY})
+    this.setState({player: A_SIDE, phase: STAND_BY, gameFinished:false})
   }
 
   _changePlayer=()=>{
@@ -232,22 +237,33 @@ class Game extends React.Component {
     this.setState({phase:newPhase})
   }
 
+  _judgeFinish=(i,squares)=>{
+    if (squares[i]['piece']==='ou'){
+      this.setState({gameFinished:true})
+      return true
+    }
+    return false
+  }
+
   render() {
-    const{player,phase}=this.state
+    const{player,phase,gameFinished}=this.state
     return (
       <div className="game">
         <div className="game-board">
           <Board 
           player={player}
           phase={phase}
+          gameFinished={gameFinished}
           changePlayer={this._changePlayer}
           changePhase={this._changePhase}
           initGame={this._initGame}
+          judgeFinish={this._judgeFinish}
           />
         </div>
         <div className="game-info">
           <div>player : {player}</div>
-          <div>phase : {phase}</div>
+          <br/>
+          {gameFinished && <div>{player} の勝ちです !</div>}
         </div>
       </div>
     );
