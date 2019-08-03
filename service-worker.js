@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/React_Syogi.io/precache-manifest.b3707cf0b5ec26b7c5f08438919192cd.js"
+  "/React_Syogi.io/precache-manifest.c2b722c749ebf0764106d7911f9976c9.js"
 );
 
 self.addEventListener('message', (event) => {
