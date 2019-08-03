@@ -79,15 +79,21 @@ class Board extends React.Component {
     const squares = this.state.squares.slice()
     const {selectedSquareNo} = this.state
     const {piece, owner, toMove} = squares[i]
-    const { pointMove, lineMove }= PIECES[piece]
+    let { pointMove, lineMove }= PIECES[piece]
+
+    if (player===B_SIDE){
+      let {newPointMove, newLineMove} = this.convertMove(pointMove,lineMove)
+      pointMove = newPointMove
+      lineMove = newLineMove
+    }
 
     this.clearAllToMove(squares)
     switch(phase){
       case STAND_BY:
         if (owner===player){
           this.getMoveList(i,pointMove,lineMove,squares,player,selectedSquareNo)
+          changePhase(PICK_UP)
         }
-        changePhase(PICK_UP)
         break
       case PICK_UP:
         if (toMove){
@@ -95,8 +101,11 @@ class Board extends React.Component {
           squares[selectedSquareNo]={'piece':'','owner':'','toMove':false}
           this.setState({squares:squares})
           changePhase(STAND_BY)
+          changePlayer()
         }else if(owner===player){
-          this.getMoveList(i,pointMove,lineMove,squares,player,selectedSquareNo)
+          this.getMoveList(i,pointMove,lineMove,squares,player)
+        }else{
+          changePhase(STAND_BY)
         }
         break
       default:
@@ -140,7 +149,7 @@ class Board extends React.Component {
     return lineMoveList
   }
 
-  getMoveList=(i,pointMove,lineMove,squares,player,selectedSquareNo)=>{
+  getMoveList=(i,pointMove,lineMove,squares,player)=>{
     const pointMoveList = this.getPointMoveList(i,pointMove,squares,player)
     const lineMoveList = this.getLineMoveList(i,lineMove,squares,player)
     const toMoveList = [...pointMoveList, ...lineMoveList]
@@ -148,6 +157,16 @@ class Board extends React.Component {
       return squares[point]['toMove']=true
     })
     this.setState({squares:squares, selectedSquareNo:i})
+  }
+
+  convertMove=(pointMove,lineMove)=>{
+    const newPointMove = pointMove.map(element=>{
+      return element*=-1
+    })
+    const newLineMove = lineMove.map(element=>{
+      return element*=-1
+    })
+    return {newPointMove:newPointMove, newLineMove:newLineMove}
   }
 
   renderSquare(i) {
@@ -204,7 +223,7 @@ class Game extends React.Component {
   }
 
   _changePlayer=()=>{
-    let player = this.state
+    let {player} = this.state
     player===A_SIDE ? player=B_SIDE : player=A_SIDE
     this.setState({player:player})
   }
